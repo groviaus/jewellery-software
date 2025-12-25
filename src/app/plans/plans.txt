@@ -1,0 +1,244 @@
+
+
+# 🏪 Jewellery Store Management – MVP Plan (Single Store)
+
+## 🎯 Goal
+
+Build a **demo-ready MVP** for a **single jewellery store owner** that demonstrates:
+
+* GST billing
+* Basic inventory control
+* Simple customer handling
+* Minimal reports
+
+The MVP should be **usable in 5–10 minutes during a demo** and **easy to extend later**.
+
+---
+
+## 🧩 Scope of MVP (What We Will Build)
+
+### ✅ In Scope
+
+* Billing (GST)
+* Inventory (basic jewellery attributes)
+* Customer basic info
+* Simple reports
+* Single user (owner)
+
+### ❌ Out of Scope (Future)
+
+* Multi-store
+* Manufacturing
+* Accounting ledger
+* HR / payroll
+* Advanced analytics
+* E-commerce
+
+---
+
+## 🧾 MODULE 1: Billing / POS (Core MVP)
+
+### Features
+
+* Create GST-compliant invoice
+* POS-style billing screen
+* Add jewellery item to bill
+* Auto calculation:
+
+  * Gold value
+  * Making charges
+  * GST
+  * Grand total
+* Print / Download invoice (PDF)
+* Share invoice (optional: WhatsApp/email)
+
+### Demo Value
+
+> Shows **real daily operation** of a jewellery shop
+
+---
+
+## 📦 MODULE 2: Inventory Management (Basic Jewellery)
+
+### Item Attributes
+
+* Item name
+* Metal type (Gold / Silver / Diamond)
+* Purity (22K / 18K / etc.)
+* Gross weight
+* Net weight
+* Making charges
+* Quantity (or unique item)
+* SKU / Item ID
+
+### Features
+
+* Add / Edit / Delete item
+* View current stock list
+* Auto reduce stock on sale
+* Simple search (name / SKU)
+
+### Demo Value
+
+> Shows **control over high-value inventory**
+
+---
+
+## 👥 MODULE 3: Customer Management (Minimal)
+
+### Features
+
+* Save customer:
+
+  * Name
+  * Phone number
+* Attach customer to invoice
+* View customer purchase history (basic list)
+
+### Demo Value
+
+> Shows **repeat customer handling**
+
+---
+
+## 📊 MODULE 4: Reports (Demo-Level)
+
+### Reports
+
+* Daily sales summary
+* Total revenue (date-wise)
+* Sold items list
+* Current stock summary
+
+### Export
+
+* PDF or CSV (optional)
+
+### Demo Value
+
+> Shows **business visibility for owner**
+
+---
+
+## ⚙️ MODULE 5: Store & System Settings
+
+### Features
+
+* Store profile:
+
+  * Store name
+  * GST number
+  * Address
+* GST rate configuration
+* Currency (INR)
+* Single user login (Owner)
+
+---
+
+## 🔐 MODULE 6: Authentication (Minimal)
+
+### Features
+
+* Owner login
+* Protected routes
+* No role management (MVP only)
+
+---
+
+## 🗂 MVP USER FLOW (Demo Script)
+
+1. **Login**
+2. **Dashboard**
+
+   * Today’s sales
+   * Stock count
+3. **Inventory**
+
+   * Add jewellery item
+4. **POS / Billing**
+
+   * Select item
+   * Add customer
+   * Generate invoice
+5. **Reports**
+
+   * View daily sales
+
+⏱ Demo time: **5–8 minutes**
+
+---
+
+## 🧱 Suggested Data Models (Simple)
+
+### User
+
+* id
+* name
+* email
+* password
+
+### Item
+
+* id
+* name
+* metal_type
+* purity
+* gross_weight
+* net_weight
+* making_charge
+* quantity
+* sku
+
+### Customer
+
+* id
+* name
+* phone
+
+### Invoice
+
+* id
+* customer_id
+* total_amount
+* gst_amount
+* created_at
+
+### InvoiceItem
+
+* invoice_id
+* item_id
+* weight
+* price
+
+---
+
+## 🛠 Tech-Agnostic (Cursor Friendly)
+
+You can use:
+
+* **Frontend**: Next.js
+* **UI**: Tailwind / Shadcn
+* **Backend**: Next API 
+* **DB**: Supabase (use Supabase mcp)
+* **PDF**: simple invoice generator
+
+---
+
+## 📌 MVP Feature Checklist (Final)
+
+### Must-Have
+
+* [x] GST billing
+* [x] Inventory add/edit
+* [x] Stock update on sale
+* [x] Customer info
+* [x] Daily sales report
+* [x] Owner login
+
+### Optional (If Time Allows)
+
+* [ ] Barcode support
+* [ ] Invoice PDF download
+* [ ] CSV export
+* [ ] WhatsApp bill share
+
