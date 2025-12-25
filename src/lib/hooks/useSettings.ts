@@ -82,8 +82,13 @@ export function useCreateSettings() {
     onSuccess: (data) => {
       // Update cache
       queryClient.setQueryData(settingsKeys.current(), data)
+      // Invalidate to ensure fresh data
+      queryClient.invalidateQueries({ queryKey: settingsKeys.current() })
       // Update Zustand store
       setStoreSettings(data)
+    },
+    onError: (error) => {
+      console.error('Failed to create settings:', error)
     },
   })
 }
@@ -97,8 +102,13 @@ export function useUpdateSettings() {
     onSuccess: (data) => {
       // Update cache
       queryClient.setQueryData(settingsKeys.current(), data)
+      // Invalidate to ensure fresh data
+      queryClient.invalidateQueries({ queryKey: settingsKeys.current() })
       // Update Zustand store
       setStoreSettings(data)
+    },
+    onError: (error) => {
+      console.error('Failed to update settings:', error)
     },
   })
 }

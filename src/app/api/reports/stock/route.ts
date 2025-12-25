@@ -10,6 +10,15 @@ export async function GET() {
       return unauthorizedResponse()
     }
 
+    // Fetch settings to get stock alert threshold
+    const { data: settings } = await supabase
+      .from(TABLES.STORE_SETTINGS)
+      .select('stock_alert_threshold')
+      .eq('user_id', user.id)
+      .single()
+
+    const stockAlertThreshold = settings?.stock_alert_threshold || 5
+
     const { data: items, error } = await supabase
       .from(TABLES.ITEMS)
       .select('*')
@@ -25,7 +34,7 @@ export async function GET() {
       total_gold_items: items?.filter((item) => item.metal_type === 'Gold').length || 0,
       total_silver_items: items?.filter((item) => item.metal_type === 'Silver').length || 0,
       total_diamond_items: items?.filter((item) => item.metal_type === 'Diamond').length || 0,
-      low_stock_items: items?.filter((item) => item.quantity < 5).length || 0,
+      low_stock_items: items?.filter((item) => item.quantity <= stockAlertThreshold && item.quantity > 0).length || 0,
     }
 
     return NextResponse.json({ data: summary })

@@ -215,7 +215,7 @@ export default function InvoicePreview({
         item.making_charges !== newMakingCharges ||
         item.subtotal !== newSubtotal
       ) {
-        onUpdateItem(item.item_id, {
+      onUpdateItem(item.item_id, {
           gold_value: newGoldValue,
           making_charges: newMakingCharges,
           subtotal: newSubtotal,
@@ -347,24 +347,24 @@ export default function InvoicePreview({
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <div className="max-h-64 overflow-y-auto rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
+      <div className="max-h-64 overflow-y-auto rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
                 <TableHead className="w-[30px]"></TableHead>
-                <TableHead>Item</TableHead>
-                <TableHead>Weight</TableHead>
-                <TableHead>Qty</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
+              <TableHead>Item</TableHead>
+              <TableHead>Weight</TableHead>
+              <TableHead>Qty</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
                 <TableHead className="w-[100px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
               <SortableContext
                 items={cart.map((item) => item.item_id)}
                 strategy={verticalListSortingStrategy}
               >
-                {cart.map((item) => (
+            {cart.map((item) => (
                   <SortableCartRow
                     key={item.item_id}
                     item={item}
@@ -375,9 +375,9 @@ export default function InvoicePreview({
                   />
                 ))}
               </SortableContext>
-            </TableBody>
-          </Table>
-        </div>
+          </TableBody>
+        </Table>
+      </div>
       </DndContext>
 
       <div className="space-y-2 border-t pt-4">

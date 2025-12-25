@@ -47,47 +47,46 @@ export function getLastGoldRate(): number | null {
 }
 
 /**
- * Fetch current gold rate from API
- * Uses a free gold rate API service
- * Falls back to manual entry if API fails
+ * Fetch current gold rate from API by carat
+ * Uses our backend API endpoint to avoid CORS issues
+ * @param carat - Optional carat value (22, 18, etc.). If not provided, returns 22K rate by default
+ * @returns Gold rate per gram in INR, or null if failed
  */
-export async function fetchGoldRateFromAPI(): Promise<number | null> {
+export async function fetchGoldRateFromAPI(carat?: number): Promise<number | null> {
   try {
-    // Using a free gold rate API (example: goldapi.io or similar)
-    // For production, you should use a paid API service or your own backend
-    // This is a placeholder that simulates API call
+    // Call our backend API endpoint
+    const url = carat 
+      ? `/api/gold-rate?carat=${carat}`
+      : '/api/gold-rate?carat=22' // Default to 22K for India
     
-    // Option 1: Use a public API (if available)
-    // const response = await fetch('https://api.goldapi.io/api/XAU/INR', {
-    //   headers: {
-    //     'x-access-token': process.env.NEXT_PUBLIC_GOLD_API_KEY || '',
-    //   },
-    // })
-    
-    // Option 2: Use a simpler approach with a free API
-    // For now, we'll use a mock that returns a reasonable rate
-    // In production, replace this with actual API call
-    
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    
-    // Mock response - in production, replace with actual API call
-    // For Indian gold rates, you might use:
-    // - MCX (Multi Commodity Exchange) API
-    // - GoldAPI.io
-    // - Or your own backend service
-    
-    // For now, return null to indicate API is not configured
-    // User can still manually enter the rate
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // Don't cache to get fresh rates
+      cache: 'no-store',
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (data.success && typeof data.rate === 'number') {
+      return data.rate
+    }
+
+    // If rates object is returned, extract the appropriate carat
+    if (data.success && data.rates) {
+      const caratKey = carat ? `${carat}K` : '22K'
+      if (data.rates[caratKey]) {
+        return data.rates[caratKey]
+      }
+    }
+
     return null
-    
-    // Example implementation when API is available:
-    // const response = await fetch('YOUR_GOLD_RATE_API_URL')
-    // if (!response.ok) {
-    //   throw new Error('Failed to fetch gold rate')
-    // }
-    // const data = await response.json()
-    // return data.rate || data.price || null
   } catch (error) {
     console.error('Error fetching gold rate from API:', error)
     return null
@@ -95,19 +94,57 @@ export async function fetchGoldRateFromAPI(): Promise<number | null> {
 }
 
 /**
+ * Fetch all gold rates by carat (24K, 22K, 18K, 14K, 10K)
+ * @returns Object with rates for each carat, or null if failed
+ */
+export async function fetchAllGoldRatesByCarat(): Promise<{
+  '24K': number
+  '22K': number
+  '18K': number
+  '14K': number
+  '10K': number
+} | null> {
+  try {
+    const response = await fetch('/api/gold-rate', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (data.success && data.rates) {
+      return data.rates
+    }
+
+    return null
+  } catch (error) {
+    console.error('Error fetching all gold rates from API:', error)
+    return null
+  }
+}
+
+/**
  * Get gold rate from API with error handling
+ * @param carat - Optional carat value (22, 18, etc.). Defaults to 22K
  * Returns the rate if successful, null if failed
  */
-export async function getGoldRateFromAPI(): Promise<{
+export async function getGoldRateFromAPI(carat?: number): Promise<{
   rate: number | null
   error: string | null
 }> {
   try {
-    const rate = await fetchGoldRateFromAPI()
+    const rate = await fetchGoldRateFromAPI(carat)
     if (rate === null) {
       return {
         rate: null,
-        error: 'Gold rate API is not configured. Please enter the rate manually.',
+        error: 'Unable to fetch gold rate from API. This may be due to:\n• API service temporarily unavailable\n• Network connectivity issues\n• API key not configured (optional)\n\nPlease enter the gold rate manually or try again later.',
       }
     }
     return { rate, error: null }

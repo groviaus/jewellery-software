@@ -14,7 +14,7 @@ import { ShoppingCart, X, History, RefreshCw, Keyboard } from 'lucide-react'
 import { useSettings } from '@/lib/hooks/useSettings'
 import { useCreateInvoice } from '@/lib/hooks/useInvoices'
 import { toast } from '@/lib/utils/toast'
-import { getLastGoldRate, saveGoldRate, getGoldRateHistory, getGoldRateFromAPI } from '@/lib/utils/gold-rate'
+import { getLastGoldRate, saveGoldRate, getGoldRateHistory, getGoldRateFromAPI, fetchAllGoldRatesByCarat } from '@/lib/utils/gold-rate'
 import { useKeyboardShortcut } from '@/lib/hooks/useKeyboardShortcut'
 
 export default function POSScreen() {
@@ -24,6 +24,13 @@ export default function POSScreen() {
   const [goldRate, setGoldRate] = useState<string>('')
   const [error, setError] = useState('')
   const [isFetchingGoldRate, setIsFetchingGoldRate] = useState(false)
+  const [goldRatesByCarat, setGoldRatesByCarat] = useState<{
+    '24K': number
+    '22K': number
+    '18K': number
+    '14K': number
+    '10K': number
+  } | null>(null)
 
   // Fetch settings using React Query hook
   const { data: settings } = useSettings()
@@ -98,12 +105,22 @@ export default function POSScreen() {
   const handleFetchGoldRate = async () => {
     setIsFetchingGoldRate(true)
     try {
-      const { rate, error: apiError } = await getGoldRateFromAPI()
-      if (apiError || rate === null) {
-        toast.warning('API not configured', apiError || 'Please enter the gold rate manually')
+      // Fetch all rates by carat
+      const allRates = await fetchAllGoldRatesByCarat()
+      if (allRates) {
+        setGoldRatesByCarat(allRates)
+        // Default to 22K (most common in India)
+        setGoldRate(allRates['22K'].toString())
+        toast.success('Gold rates fetched', `22K: ₹${allRates['22K'].toFixed(2)}/gram`)
       } else {
-        setGoldRate(rate.toString())
-        toast.success('Gold rate fetched', `Current rate: ₹${rate.toFixed(2)} per gram`)
+        // Fallback: try fetching single rate
+        const { rate, error: apiError } = await getGoldRateFromAPI(22)
+        if (apiError || rate === null) {
+          toast.warning('API not configured', apiError || 'Please enter the gold rate manually')
+        } else {
+          setGoldRate(rate.toString())
+          toast.success('Gold rate fetched', `Current rate: ₹${rate.toFixed(2)} per gram`)
+        }
       }
     } catch (err) {
       const errorMessage =
@@ -212,12 +229,54 @@ export default function POSScreen() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
+              {/* Display rates by carat if available */}
+              {goldRatesByCarat && (
+                <div className="rounded-lg border bg-muted/50 p-3">
+                  <Label className="text-xs font-semibold mb-2 block">Current Market Rates (₹ per gram)</Label>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">24K:</span>
+                      <span className="font-medium">₹{goldRatesByCarat['24K'].toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">22K:</span>
+                      <span className="font-medium">₹{goldRatesByCarat['22K'].toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">18K:</span>
+                      <span className="font-medium">₹{goldRatesByCarat['18K'].toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">14K:</span>
+                      <span className="font-medium">₹{goldRatesByCarat['14K'].toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between col-span-2">
+                      <span className="text-muted-foreground">10K:</span>
+                      <span className="font-medium">₹{goldRatesByCarat['10K'].toFixed(2)}</span>
+                    </div>
+                  </div>
+                  <div className="mt-2 flex gap-1 flex-wrap">
+                    {(['24K', '22K', '18K', '14K', '10K'] as const).map((carat) => (
+                      <Button
+                        key={carat}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-7"
+                        onClick={() => setGoldRate(goldRatesByCarat[carat].toString())}
+                      >
+                        Use {carat}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="gold_rate">Current Gold Rate (₹ per gram)</Label>
                 <Input
                   id="gold_rate"
                   type="number"
                   step="0.01"
+                  min="0"
                   value={goldRate}
                   onChange={(e) => setGoldRate(e.target.value)}
                   placeholder="Enter gold rate"

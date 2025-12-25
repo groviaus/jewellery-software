@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select'
 import type { StoreSettings, Theme, DateFormat } from '@/lib/types/settings'
 import { useCreateSettings, useUpdateSettings } from '@/lib/hooks/useSettings'
+import { useTheme } from '@/lib/hooks/useTheme'
 import { toast } from '@/lib/utils/toast'
 import { Upload, Image as ImageIcon, Moon, Sun, Monitor } from 'lucide-react'
 import AdvancedSettings from './AdvancedSettings'
@@ -61,6 +62,7 @@ export default function TabbedSettingsForm({ initialData }: TabbedSettingsFormPr
 
   const createMutation = useCreateSettings()
   const updateMutation = useUpdateSettings()
+  const { setTheme: setThemeImmediate } = useTheme()
 
   const {
     register,
@@ -106,18 +108,38 @@ export default function TabbedSettingsForm({ initialData }: TabbedSettingsFormPr
 
   const onSubmit = async (data: SettingsFormData) => {
     setError('')
+    console.log('Form submitted with data:', data)
 
     try {
       if (initialData) {
-        await updateMutation.mutateAsync(data)
-        toast.success('Settings updated successfully')
+        console.log('Updating existing settings...')
+        const result = await updateMutation.mutateAsync(data)
+        console.log('Settings updated successfully:', result)
+        toast.success('Settings updated successfully', 'Your changes have been saved.')
+        // Update form with latest data
+        if (result) {
+          reset(result)
+        }
+        // Small delay before refresh to ensure toast is visible
+        setTimeout(() => {
+          router.refresh()
+        }, 500)
       } else {
-        await createMutation.mutateAsync(data)
-        toast.success('Settings saved successfully')
+        console.log('Creating new settings...')
+        const result = await createMutation.mutateAsync(data)
+        console.log('Settings created successfully:', result)
+        toast.success('Settings saved successfully', 'Your settings have been created.')
+        // Update form with latest data
+        if (result) {
+          reset(result)
+        }
+        // Small delay before refresh to ensure toast is visible
+        setTimeout(() => {
+          router.refresh()
+        }, 500)
       }
-
-      router.refresh()
     } catch (err) {
+      console.error('Settings submission error:', err)
       const errorMessage =
         err instanceof Error ? err.message : 'An error occurred. Please try again.'
       setError(errorMessage)
@@ -125,8 +147,19 @@ export default function TabbedSettingsForm({ initialData }: TabbedSettingsFormPr
     }
   }
 
+  // Handle form validation errors
+  const onError = (errors: any) => {
+    console.log('Form validation errors:', errors)
+    const firstError = Object.values(errors)[0] as any
+    if (firstError?.message) {
+      toast.error('Validation error', firstError.message)
+    } else {
+      toast.error('Please fix the form errors', 'Some fields have invalid values')
+    }
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit, onError)}>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="store-info">Store Info</TabsTrigger>
@@ -280,7 +313,16 @@ export default function TabbedSettingsForm({ initialData }: TabbedSettingsFormPr
                 <Label htmlFor="theme">Theme</Label>
                 <Select
                   value={watch('theme') || 'light'}
-                  onValueChange={(value) => setValue('theme', value as Theme)}
+                  onValueChange={(value) => {
+                    const themeValue = value as Theme
+                    setValue('theme', themeValue)
+                    // Apply theme immediately for instant feedback
+                    // The hook handles errors gracefully and always applies the theme
+                    setThemeImmediate(themeValue).catch((err) => {
+                      // Only log - theme is already applied
+                      console.warn('Theme applied but database update may have failed:', err)
+                    })
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />

@@ -98,7 +98,18 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json()
-    const { store_name, gst_number, address, gst_rate } = body
+    const {
+      store_name,
+      gst_number,
+      address,
+      gst_rate,
+      stock_alert_threshold,
+      currency_symbol,
+      date_format,
+      timezone,
+      theme,
+      logo_url,
+    } = body
 
     if (!store_name) {
       return NextResponse.json(

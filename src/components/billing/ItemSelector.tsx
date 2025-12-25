@@ -14,6 +14,7 @@ import {
 import { Search, Plus, Keyboard } from 'lucide-react'
 import type { CartItem } from '@/lib/types/billing'
 import { useInventory } from '@/lib/hooks/useInventory'
+import { useSettings } from '@/lib/hooks/useSettings'
 import type { Item } from '@/lib/types/inventory'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useKeyboardShortcut } from '@/lib/hooks/useKeyboardShortcut'
@@ -27,6 +28,8 @@ export default function ItemSelector({ onAddToCart }: ItemSelectorProps) {
   const [selectedItemIndex, setSelectedItemIndex] = useState(0)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const { data: items = [], isLoading } = useInventory()
+  const { data: settings } = useSettings()
+  const stockAlertThreshold = settings?.stock_alert_threshold || 5
 
   const filteredItems = useMemo(
     () =>
@@ -132,7 +135,7 @@ export default function ItemSelector({ onAddToCart }: ItemSelectorProps) {
               </TableRow>
             ) : (
               filteredItems.map((item, index) => {
-                const isLowStock = item.quantity <= 5
+                const isLowStock = item.quantity <= stockAlertThreshold && item.quantity > 0
                 const isOutOfStock = item.quantity === 0
                 const isSelected = index === selectedItemIndex
                 
