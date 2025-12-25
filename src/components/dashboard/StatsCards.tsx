@@ -5,6 +5,7 @@ import { formatCurrency } from '@/lib/utils/calculations'
 import { TrendingUp, Package, DollarSign, AlertTriangle } from 'lucide-react'
 import { useTodayInvoices } from '@/lib/hooks/useInvoices'
 import { useInventory } from '@/lib/hooks/useInventory'
+import { useSettings } from '@/lib/hooks/useSettings'
 import { useMemo } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,8 @@ export default function StatsCards({ todaySales: initialTodaySales, totalStock: 
   // Use server-provided data as primary, React Query for updates
   const { data: todayInvoices } = useTodayInvoices({ initialData: [] })
   const { data: items } = useInventory()
+  const { data: settings } = useSettings()
+  const stockAlertThreshold = settings?.stock_alert_threshold || 5
 
   const todaySales = useMemo(() => {
     // Prefer server-provided data, fallback to calculated from React Query
@@ -43,8 +46,8 @@ export default function StatsCards({ todaySales: initialTodaySales, totalStock: 
 
   const lowStockCount = useMemo(() => {
     if (!items || items.length === 0) return 0
-    return items.filter((item) => item.quantity <= 5 && item.quantity > 0).length
-  }, [items])
+    return items.filter((item) => item.quantity <= stockAlertThreshold && item.quantity > 0).length
+  }, [items, stockAlertThreshold])
 
   const outOfStockCount = useMemo(() => {
     if (!items || items.length === 0) return 0

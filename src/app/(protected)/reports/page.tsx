@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { FileText, Package, TrendingUp } from 'lucide-react'
+import { FileText, Package, TrendingUp, DollarSign, Award, Receipt } from 'lucide-react'
 
 export default function ReportsPage() {
   return (
@@ -50,6 +50,51 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent>
             <Link href="/reports/sold">
+              <Button className="w-full">View Report</Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5" />
+              Profit Margin
+            </CardTitle>
+            <CardDescription>Analyze profit margins by metal type</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/reports/profit-margin">
+              <Button className="w-full">View Report</Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Award className="h-5 w-5" />
+              Top Selling Items
+            </CardTitle>
+            <CardDescription>Best performing products</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/reports/top-selling">
+              <Button className="w-full">View Report</Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Receipt className="h-5 w-5" />
+              GST Report
+            </CardTitle>
+            <CardDescription>GST summary for tax filing</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/reports/gst">
               <Button className="w-full">View Report</Button>
             </Link>
           </CardContent>

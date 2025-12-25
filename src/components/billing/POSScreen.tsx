@@ -10,11 +10,12 @@ import ItemSelector from './ItemSelector'
 import CustomerSelector from './CustomerSelector'
 import InvoicePreview from './InvoicePreview'
 import type { CartItem } from '@/lib/types/billing'
-import { ShoppingCart, X, History } from 'lucide-react'
+import { ShoppingCart, X, History, RefreshCw, Keyboard } from 'lucide-react'
 import { useSettings } from '@/lib/hooks/useSettings'
 import { useCreateInvoice } from '@/lib/hooks/useInvoices'
 import { toast } from '@/lib/utils/toast'
-import { getLastGoldRate, saveGoldRate, getGoldRateHistory } from '@/lib/utils/gold-rate'
+import { getLastGoldRate, saveGoldRate, getGoldRateHistory, getGoldRateFromAPI } from '@/lib/utils/gold-rate'
+import { useKeyboardShortcut } from '@/lib/hooks/useKeyboardShortcut'
 
 export default function POSScreen() {
   const router = useRouter()
@@ -22,6 +23,7 @@ export default function POSScreen() {
   const [customerId, setCustomerId] = useState<string | null>(null)
   const [goldRate, setGoldRate] = useState<string>('')
   const [error, setError] = useState('')
+  const [isFetchingGoldRate, setIsFetchingGoldRate] = useState(false)
 
   // Fetch settings using React Query hook
   const { data: settings } = useSettings()
@@ -29,11 +31,28 @@ export default function POSScreen() {
 
   const createInvoiceMutation = useCreateInvoice()
 
-  // Load last used gold rate on mount
+  // Load last used gold rate on mount and draft if exists
   useEffect(() => {
     const lastRate = getLastGoldRate()
     if (lastRate) {
       setGoldRate(lastRate.toString())
+    }
+
+    // Load draft if exists
+    const draft = localStorage.getItem('invoice_draft')
+    if (draft) {
+      try {
+        const parsedDraft = JSON.parse(draft)
+        if (parsedDraft.cart && parsedDraft.cart.length > 0) {
+          setCart(parsedDraft.cart)
+          if (parsedDraft.goldRate) {
+            setGoldRate(parsedDraft.goldRate.toString())
+          }
+          toast.info('Draft loaded', 'Previous invoice draft has been loaded')
+        }
+      } catch (error) {
+        console.error('Error loading draft:', error)
+      }
     }
   }, [])
 
@@ -55,6 +74,19 @@ export default function POSScreen() {
     setCart((prev) => prev.filter((item) => item.item_id !== itemId))
   }
 
+  const duplicateCartItem = (item: CartItem) => {
+    const duplicatedItem: CartItem = {
+      ...item,
+      item_id: `${item.item_id}-${Date.now()}`,
+    }
+    setCart((prev) => [...prev, duplicatedItem])
+    toast.success('Item duplicated', item.item.name)
+  }
+
+  const reorderCartItems = (newCart: CartItem[]) => {
+    setCart(newCart)
+  }
+
   const updateCartItem = useCallback((itemId: string, updates: Partial<CartItem>) => {
     setCart((prev) =>
       prev.map((item) =>
@@ -62,6 +94,43 @@ export default function POSScreen() {
       )
     )
   }, [])
+
+  const handleFetchGoldRate = async () => {
+    setIsFetchingGoldRate(true)
+    try {
+      const { rate, error: apiError } = await getGoldRateFromAPI()
+      if (apiError || rate === null) {
+        toast.warning('API not configured', apiError || 'Please enter the gold rate manually')
+      } else {
+        setGoldRate(rate.toString())
+        toast.success('Gold rate fetched', `Current rate: ₹${rate.toFixed(2)} per gram`)
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to fetch gold rate'
+      toast.error('Error fetching gold rate', errorMessage)
+    } finally {
+      setIsFetchingGoldRate(false)
+    }
+  }
+
+  // Keyboard shortcuts
+  // Ctrl/Cmd + Enter: Checkout
+  useKeyboardShortcut('Enter', () => {
+    if (cart.length > 0 && goldRate && !createInvoiceMutation.isPending) {
+      handleCheckout()
+    }
+  }, { ctrl: true, meta: true })
+
+  // Esc: Clear cart
+  useKeyboardShortcut('Escape', () => {
+    if (cart.length > 0) {
+      if (confirm('Clear cart?')) {
+        setCart([])
+        toast.info('Cart cleared')
+      }
+    }
+  })
 
   const handleCheckout = async () => {
     if (cart.length === 0) {
@@ -111,22 +180,34 @@ export default function POSScreen() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Gold Rate</span>
-              {getGoldRateHistory().length > 0 && (
+              <div className="flex items-center gap-2">
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  onClick={() => {
-                    const history = getGoldRateHistory()
-                    if (history.length > 0) {
-                      setGoldRate(history[0].rate.toString())
-                    }
-                  }}
+                  onClick={handleFetchGoldRate}
+                  disabled={isFetchingGoldRate}
                   className="text-xs"
                 >
-                  <History className="mr-1 h-3 w-3" />
-                  Last: ₹{getLastGoldRate()?.toFixed(2)}
+                  <RefreshCw className={`mr-1 h-3 w-3 ${isFetchingGoldRate ? 'animate-spin' : ''}`} />
+                  {isFetchingGoldRate ? 'Fetching...' : 'Fetch Current Rate'}
                 </Button>
-              )}
+                {getGoldRateHistory().length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const history = getGoldRateHistory()
+                      if (history.length > 0) {
+                        setGoldRate(history[0].rate.toString())
+                      }
+                    }}
+                    className="text-xs"
+                  >
+                    <History className="mr-1 h-3 w-3" />
+                    Last: ₹{getLastGoldRate()?.toFixed(2)}
+                  </Button>
+                )}
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -209,9 +290,11 @@ export default function POSScreen() {
               gstRate={gstRate}
               onRemoveItem={removeFromCart}
               onUpdateItem={updateCartItem}
+              onReorderItems={reorderCartItems}
+              onDuplicateItem={duplicateCartItem}
             />
 
-            <div className="mt-6">
+            <div className="mt-6 space-y-2">
               <Button
                 className="w-full"
                 onClick={handleCheckout}
@@ -219,6 +302,10 @@ export default function POSScreen() {
               >
                 {createInvoiceMutation.isPending ? 'Processing...' : 'Generate Invoice'}
               </Button>
+              <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
+                <Keyboard className="h-3 w-3" />
+                <span>Ctrl+Enter to checkout</span>
+              </div>
             </div>
           </CardContent>
         </Card>

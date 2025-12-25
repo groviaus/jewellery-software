@@ -11,6 +11,10 @@ import {
 } from '@/components/ui/table'
 import { useStockSummary } from '@/lib/hooks/useReports'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
+import { exportReportToPDF } from '@/lib/utils/pdf-export'
+import { exportReportToExcel } from '@/lib/utils/excel-export'
+import { FileText, FileSpreadsheet } from 'lucide-react'
 
 export default function StockSummary() {
   const { data: summary, isLoading } = useStockSummary()
@@ -30,8 +34,81 @@ export default function StockSummary() {
     return <p className="text-center text-gray-500">No data available</p>
   }
 
+  const handleExportPDF = () => {
+    const exportData = [
+      {
+        Metric: 'Total Items',
+        Value: summary.total_items,
+      },
+      {
+        Metric: 'Total Quantity',
+        Value: summary.total_quantity,
+      },
+      {
+        Metric: 'Gold Items',
+        Value: summary.total_gold_items,
+      },
+      {
+        Metric: 'Silver Items',
+        Value: summary.total_silver_items,
+      },
+      {
+        Metric: 'Diamond Items',
+        Value: summary.total_diamond_items,
+      },
+      {
+        Metric: 'Low Stock Items',
+        Value: summary.low_stock_items,
+      },
+    ]
+
+    exportReportToPDF(exportData, 'Stock Summary Report', 'stock-summary')
+  }
+
+  const handleExportExcel = () => {
+    const exportData = [
+      {
+        Metric: 'Total Items',
+        Value: summary.total_items,
+      },
+      {
+        Metric: 'Total Quantity',
+        Value: summary.total_quantity,
+      },
+      {
+        Metric: 'Gold Items',
+        Value: summary.total_gold_items,
+      },
+      {
+        Metric: 'Silver Items',
+        Value: summary.total_silver_items,
+      },
+      {
+        Metric: 'Diamond Items',
+        Value: summary.total_diamond_items,
+      },
+      {
+        Metric: 'Low Stock Items',
+        Value: summary.low_stock_items,
+      },
+    ]
+
+    exportReportToExcel(exportData, 'Stock Summary Report', 'stock-summary')
+  }
+
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className="space-y-4">
+      <div className="flex items-center justify-end gap-2">
+        <Button variant="outline" size="sm" onClick={handleExportPDF}>
+          <FileText className="mr-2 h-4 w-4" />
+          PDF
+        </Button>
+        <Button variant="outline" size="sm" onClick={handleExportExcel}>
+          <FileSpreadsheet className="mr-2 h-4 w-4" />
+          Excel
+        </Button>
+      </div>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Total Items</CardTitle>
@@ -91,6 +168,7 @@ export default function StockSummary() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   )
 }

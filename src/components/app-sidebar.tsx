@@ -9,6 +9,7 @@ import {
   FileText,
   Settings,
   LogOut,
+  BarChart3,
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -51,6 +52,11 @@ const menuItems = [
     title: "Reports",
     icon: FileText,
     href: "/reports",
+  },
+  {
+    title: "Analytics",
+    icon: BarChart3,
+    href: "/analytics",
   },
   {
     title: "Settings",

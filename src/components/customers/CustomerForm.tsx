@@ -8,7 +8,9 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { X, Plus } from 'lucide-react'
 import type { Customer } from '@/lib/types/customer'
 import { useCreateCustomer, useUpdateCustomer } from '@/lib/hooks/useCustomers'
 import { toast } from '@/lib/utils/toast'
@@ -19,6 +21,10 @@ const customerSchema = z.object({
     .string()
     .min(10, 'Phone number must be at least 10 digits')
     .regex(/^[0-9]{10,}$/, 'Phone number must contain only digits'),
+  email: z.string().email('Invalid email address').optional().or(z.literal('')),
+  address: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  notes: z.string().optional(),
 })
 
 type CustomerFormValues = z.infer<typeof customerSchema>
@@ -30,6 +36,7 @@ interface CustomerFormProps {
 export default function CustomerForm({ initialData }: CustomerFormProps) {
   const router = useRouter()
   const [error, setError] = useState('')
+  const [tagInput, setTagInput] = useState('')
 
   const createMutation = useCreateCustomer()
   const updateMutation = useUpdateCustomer()
@@ -38,15 +45,25 @@ export default function CustomerForm({ initialData }: CustomerFormProps) {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
+    setValue,
   } = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
     defaultValues: initialData
       ? {
           name: initialData.name,
           phone: initialData.phone,
+          email: initialData.email || '',
+          address: initialData.address || '',
+          tags: initialData.tags || [],
+          notes: initialData.notes || '',
         }
-      : undefined,
+      : {
+          tags: [],
+        },
   })
+
+  const tags = watch('tags') || []
 
   const isLoading = createMutation.isPending || updateMutation.isPending
 
@@ -110,6 +127,96 @@ export default function CustomerForm({ initialData }: CustomerFormProps) {
             />
             {errors.phone && (
               <p className="text-sm text-destructive">{errors.phone.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              {...register('email')}
+              placeholder="customer@example.com"
+            />
+            {errors.email && (
+              <p className="text-sm text-destructive">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="address">Address</Label>
+            <Textarea
+              id="address"
+              {...register('address')}
+              placeholder="Street address, City, State - PIN"
+              rows={3}
+            />
+            {errors.address && (
+              <p className="text-sm text-destructive">{errors.address.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Tags</Label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {tags.map((tag, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-1 rounded-md border bg-muted px-2 py-1 text-sm"
+                >
+                  <span>{tag}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newTags = tags.filter((_, i) => i !== index)
+                      setValue('tags', newTags)
+                    }}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && tagInput.trim()) {
+                    e.preventDefault()
+                    setValue('tags', [...tags, tagInput.trim()])
+                    setTagInput('')
+                  }
+                }}
+                placeholder="Add tag and press Enter"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (tagInput.trim()) {
+                    setValue('tags', [...tags, tagInput.trim()])
+                    setTagInput('')
+                  }
+                }}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea
+              id="notes"
+              {...register('notes')}
+              placeholder="Additional notes about the customer..."
+              rows={4}
+            />
+            {errors.notes && (
+              <p className="text-sm text-destructive">{errors.notes.message}</p>
             )}
           </div>
 

@@ -38,7 +38,18 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { store_name, gst_number, address, gst_rate } = body
+    const {
+      store_name,
+      gst_number,
+      address,
+      gst_rate,
+      stock_alert_threshold,
+      currency_symbol,
+      date_format,
+      timezone,
+      theme,
+      logo_url,
+    } = body
 
     if (!store_name) {
       return NextResponse.json(
@@ -55,6 +66,12 @@ export async function POST(request: Request) {
         gst_number: gst_number || null,
         address: address || null,
         gst_rate: gst_rate || 3.0,
+        stock_alert_threshold: stock_alert_threshold || null,
+        currency_symbol: currency_symbol || '₹',
+        date_format: date_format || 'DD/MM/YYYY',
+        timezone: timezone || 'Asia/Kolkata',
+        theme: theme || 'light',
+        logo_url: logo_url || null,
       })
       .select()
       .single()
@@ -108,6 +125,12 @@ export async function PUT(request: Request) {
           gst_number: gst_number || null,
           address: address || null,
           gst_rate: gst_rate || 3.0,
+          stock_alert_threshold: stock_alert_threshold || null,
+          currency_symbol: currency_symbol || '₹',
+          date_format: date_format || 'DD/MM/YYYY',
+          timezone: timezone || 'Asia/Kolkata',
+          theme: theme || 'light',
+          logo_url: logo_url || null,
         })
         .eq('user_id', user.id)
         .select()
@@ -124,6 +147,12 @@ export async function PUT(request: Request) {
           gst_number: gst_number || null,
           address: address || null,
           gst_rate: gst_rate || 3.0,
+          stock_alert_threshold: stock_alert_threshold || null,
+          currency_symbol: currency_symbol || '₹',
+          date_format: date_format || 'DD/MM/YYYY',
+          timezone: timezone || 'Asia/Kolkata',
+          theme: theme || 'light',
+          logo_url: logo_url || null,
         })
         .select()
         .single()

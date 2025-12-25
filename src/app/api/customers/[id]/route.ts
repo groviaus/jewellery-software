@@ -47,7 +47,7 @@ export async function PUT(
     }
 
     const body = await request.json()
-    const { name, phone } = body
+    const { name, phone, email, address, tags, notes } = body
 
     // Verify customer belongs to user
     const { data: existing } = await supabase
@@ -66,6 +66,10 @@ export async function PUT(
       .update({
         name,
         phone,
+        email: email || null,
+        address: address || null,
+        tags: tags || null,
+        notes: notes || null,
       })
       .eq('id', id)
       .eq('user_id', user.id)

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/auth-api'
 import { TABLES } from '@/lib/constants'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const { user, supabase } = await getAuthenticatedUser()
 
@@ -10,29 +10,47 @@ export async function GET() {
       return unauthorizedResponse()
     }
 
-    // Get all invoice items with item details
-    const { data: invoiceItems, error: itemsError } = await supabase
+    const { searchParams } = new URL(request.url)
+    const customerId = searchParams.get('customer_id')
+    const metalType = searchParams.get('metal_type')
+
+    // Build query for invoice items
+    let invoiceQuery = supabase
       .from(TABLES.INVOICE_ITEMS)
       .select(
         `
         *,
-        invoice:${TABLES.INVOICES}(created_at, user_id),
-        item:${TABLES.ITEMS}(name, sku, user_id)
+        invoice:${TABLES.INVOICES}(created_at, user_id, customer_id),
+        item:${TABLES.ITEMS}(name, sku, user_id, metal_type)
       `
       )
+
+    // Get all invoice items with item details
+    const { data: invoiceItems, error: itemsError } = await invoiceQuery
 
     if (itemsError) {
       return NextResponse.json({ error: itemsError.message }, { status: 500 })
     }
 
-    // Filter by user and group by item
+    // Filter by user and additional filters, then group by item
     const soldItemsMap = new Map<string, any>()
 
     invoiceItems
-      ?.filter(
-        (item: any) =>
-          item.invoice?.user_id === user.id && item.item?.user_id === user.id
-      )
+      ?.filter((item: any) => {
+        // Base filter: user must match
+        if (item.invoice?.user_id !== user.id || item.item?.user_id !== user.id) {
+          return false
+        }
+        // Filter by customer if specified
+        if (customerId && item.invoice?.customer_id !== customerId) {
+          return false
+        }
+        // Filter by metal type if specified
+        if (metalType && item.item?.metal_type !== metalType) {
+          return false
+        }
+        return true
+      })
       .forEach((item: any) => {
         const itemId = item.item_id
         const existing = soldItemsMap.get(itemId) || {

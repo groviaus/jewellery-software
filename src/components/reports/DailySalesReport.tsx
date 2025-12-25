@@ -16,19 +16,34 @@ import {
 import { formatCurrency } from '@/lib/utils/calculations'
 import { format } from 'date-fns'
 import { useDailySalesReport } from '@/lib/hooks/useReports'
+import { useCustomers } from '@/lib/hooks/useCustomers'
 import { Skeleton } from '@/components/ui/skeleton'
 import { exportToCSV } from '@/lib/utils/csv-export'
-import { Download } from 'lucide-react'
+import { exportReportToPDF } from '@/lib/utils/pdf-export'
+import { exportReportToExcel } from '@/lib/utils/excel-export'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Download, FileText, FileSpreadsheet } from 'lucide-react'
 
 export default function DailySalesReport() {
   const [startDate, setStartDate] = useState(
     format(new Date(), 'yyyy-MM-dd')
   )
   const [endDate, setEndDate] = useState(format(new Date(), 'yyyy-MM-dd'))
+  const [selectedCustomer, setSelectedCustomer] = useState<string>('all')
+  const [selectedMetalType, setSelectedMetalType] = useState<string>('all')
   
+  const { data: customers = [] } = useCustomers()
   const { data: reports = [], isLoading, refetch } = useDailySalesReport(
     startDate ? `${startDate}T00:00:00.000Z` : undefined,
-    endDate ? `${endDate}T23:59:59.999Z` : undefined
+    endDate ? `${endDate}T23:59:59.999Z` : undefined,
+    selectedCustomer !== 'all' ? selectedCustomer : undefined,
+    selectedMetalType !== 'all' ? selectedMetalType : undefined
   )
 
   const fetchReports = () => {
@@ -56,21 +71,73 @@ export default function DailySalesReport() {
     exportToCSV(exportData, `daily-sales-${startDate}-to-${endDate}`)
   }
 
+  const handleExportPDF = () => {
+    if (reports.length === 0) {
+      return
+    }
+
+    const exportData = reports.map((report) => ({
+      Date: format(new Date(report.date), 'MMM dd, yyyy'),
+      Invoices: report.total_invoices,
+      Revenue: formatCurrency(report.total_revenue),
+      GST: formatCurrency(report.total_gst),
+      'Gold Value': formatCurrency(report.total_gold_value),
+      'Making Charges': formatCurrency(report.total_making_charges),
+    }))
+
+    exportReportToPDF(
+      exportData,
+      `Daily Sales Report (${format(new Date(startDate), 'MMM dd, yyyy')} - ${format(new Date(endDate), 'MMM dd, yyyy')})`,
+      `daily-sales-${startDate}-to-${endDate}`
+    )
+  }
+
+  const handleExportExcel = () => {
+    if (reports.length === 0) {
+      return
+    }
+
+    const exportData = reports.map((report) => ({
+      Date: format(new Date(report.date), 'MMM dd, yyyy'),
+      Invoices: report.total_invoices,
+      Revenue: report.total_revenue,
+      GST: report.total_gst,
+      'Gold Value': report.total_gold_value,
+      'Making Charges': report.total_making_charges,
+    }))
+
+    exportReportToExcel(
+      exportData,
+      `Daily Sales Report (${format(new Date(startDate), 'MMM dd, yyyy')} - ${format(new Date(endDate), 'MMM dd, yyyy')})`,
+      `daily-sales-${startDate}-to-${endDate}`
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Daily Sales Report</CardTitle>
           {reports.length > 0 && (
-            <Button variant="outline" size="sm" onClick={handleExportCSV}>
-              <Download className="mr-2 h-4 w-4" />
-              Export CSV
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleExportCSV}>
+                <Download className="mr-2 h-4 w-4" />
+                CSV
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleExportPDF}>
+                <FileText className="mr-2 h-4 w-4" />
+                PDF
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleExportExcel}>
+                <FileSpreadsheet className="mr-2 h-4 w-4" />
+                Excel
+              </Button>
+            </div>
           )}
         </div>
       </CardHeader>
       <CardContent>
-        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-5">
           <div className="space-y-2">
             <Label htmlFor="start_date">Start Date</Label>
             <Input
@@ -88,6 +155,36 @@ export default function DailySalesReport() {
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="customer">Customer</Label>
+            <Select value={selectedCustomer} onValueChange={setSelectedCustomer}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Customers" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Customers</SelectItem>
+                {customers.map((customer) => (
+                  <SelectItem key={customer.id} value={customer.id}>
+                    {customer.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="metal_type">Metal Type</Label>
+            <Select value={selectedMetalType} onValueChange={setSelectedMetalType}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="Gold">Gold</SelectItem>
+                <SelectItem value="Silver">Silver</SelectItem>
+                <SelectItem value="Diamond">Diamond</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex items-end">
             <Button onClick={fetchReports} disabled={isLoading} className="w-full">

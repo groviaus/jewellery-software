@@ -1,7 +1,7 @@
 import { requireAuth } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { TABLES } from '@/lib/constants'
-import StoreSettingsForm from '@/components/settings/StoreSettingsForm'
+import TabbedSettingsForm from '@/components/settings/TabbedSettingsForm'
 import { cookies } from 'next/headers'
 
 export default async function SettingsPage() {
@@ -43,7 +43,7 @@ export default async function SettingsPage() {
             <p>Error loading settings: {error.message}</p>
           </div>
         ) : (
-          <StoreSettingsForm initialData={settings} />
+          <TabbedSettingsForm initialData={settings} />
         )}
       </div>
     </div>

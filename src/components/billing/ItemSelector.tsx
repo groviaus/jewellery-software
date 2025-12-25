@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,11 +11,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Search, Plus } from 'lucide-react'
+import { Search, Plus, Keyboard } from 'lucide-react'
 import type { CartItem } from '@/lib/types/billing'
 import { useInventory } from '@/lib/hooks/useInventory'
 import type { Item } from '@/lib/types/inventory'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useKeyboardShortcut } from '@/lib/hooks/useKeyboardShortcut'
 
 interface ItemSelectorProps {
   onAddToCart: (item: CartItem) => void
@@ -23,6 +24,8 @@ interface ItemSelectorProps {
 
 export default function ItemSelector({ onAddToCart }: ItemSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedItemIndex, setSelectedItemIndex] = useState(0)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const { data: items = [], isLoading } = useInventory()
 
   const filteredItems = useMemo(
@@ -35,6 +38,26 @@ export default function ItemSelector({ onAddToCart }: ItemSelectorProps) {
       ),
     [items, searchQuery]
   )
+
+  // Reset selected index when filtered items change
+  useEffect(() => {
+    setSelectedItemIndex(0)
+  }, [filteredItems.length, searchQuery])
+
+  // Ctrl/Cmd + K: Focus search input
+  useKeyboardShortcut('k', () => {
+    searchInputRef.current?.focus()
+  }, { ctrl: true, meta: true })
+
+  // Enter: Add selected item to cart
+  useKeyboardShortcut('Enter', () => {
+    if (filteredItems.length > 0 && selectedItemIndex < filteredItems.length) {
+      const selectedItem = filteredItems[selectedItemIndex]
+      if (selectedItem && selectedItem.quantity > 0) {
+        handleAddItem(selectedItem)
+      }
+    }
+  }, { preventDefault: false })
 
   const handleAddItem = (item: Item) => {
     const cartItem: CartItem = {
@@ -76,11 +99,16 @@ export default function ItemSelector({ onAddToCart }: ItemSelectorProps) {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
         <Input
-          placeholder="Search items by name or SKU..."
+          ref={searchInputRef}
+          placeholder="Search items by name or SKU... (Ctrl+K)"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10"
         />
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-muted-foreground">
+          <Keyboard className="h-3 w-3" />
+          <span>Ctrl+K</span>
+        </div>
       </div>
 
       <div className="max-h-96 overflow-y-auto rounded-md border">
@@ -103,12 +131,17 @@ export default function ItemSelector({ onAddToCart }: ItemSelectorProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredItems.map((item) => {
+              filteredItems.map((item, index) => {
                 const isLowStock = item.quantity <= 5
                 const isOutOfStock = item.quantity === 0
+                const isSelected = index === selectedItemIndex
                 
                 return (
-                  <TableRow key={item.id} className={isOutOfStock ? 'opacity-50' : ''}>
+                  <TableRow 
+                    key={item.id} 
+                    className={`${isOutOfStock ? 'opacity-50' : ''} ${isSelected ? 'bg-muted' : ''}`}
+                    onMouseEnter={() => setSelectedItemIndex(index)}
+                  >
                     <TableCell className="font-medium">{item.name}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{item.sku}</TableCell>
                     <TableCell>{item.net_weight}g</TableCell>

@@ -27,6 +27,10 @@ const settingsSchema = z.object({
     .number()
     .min(0, 'GST rate must be 0 or greater')
     .max(100, 'GST rate cannot exceed 100%'),
+  stock_alert_threshold: z
+    .number()
+    .min(0, 'Stock alert threshold must be 0 or greater')
+    .optional(),
 })
 
 type SettingsFormData = z.infer<typeof settingsSchema>
@@ -54,6 +58,7 @@ export default function StoreSettingsForm({ initialData }: StoreSettingsFormProp
       gst_number: initialData?.gst_number || '',
       address: initialData?.address || '',
       gst_rate: initialData?.gst_rate || 3.0,
+      stock_alert_threshold: initialData?.stock_alert_threshold || 5,
     },
   })
 
@@ -64,6 +69,7 @@ export default function StoreSettingsForm({ initialData }: StoreSettingsFormProp
         gst_number: initialData.gst_number || '',
         address: initialData.address || '',
         gst_rate: initialData.gst_rate,
+        stock_alert_threshold: initialData.stock_alert_threshold || 5,
       })
     }
   }, [initialData, reset])
@@ -159,6 +165,24 @@ export default function StoreSettingsForm({ initialData }: StoreSettingsFormProp
             )}
             <p className="text-sm text-muted-foreground">
               Default GST rate for jewellery is 3%
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="stock_alert_threshold">Stock Alert Threshold</Label>
+            <Input
+              id="stock_alert_threshold"
+              type="number"
+              step="1"
+              min="0"
+              {...register('stock_alert_threshold', { valueAsNumber: true })}
+              placeholder="5"
+            />
+            {errors.stock_alert_threshold && (
+              <p className="text-sm text-destructive">{errors.stock_alert_threshold.message}</p>
+            )}
+            <p className="text-sm text-muted-foreground">
+              Items with quantity at or below this threshold will be marked as low stock. Default is 5.
             </p>
           </div>
 

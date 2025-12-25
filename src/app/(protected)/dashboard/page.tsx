@@ -1,12 +1,10 @@
 import { requireAuth } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
 import { TABLES } from '@/lib/constants'
-import StatsCards from '@/components/dashboard/StatsCards'
-import RecentSales from '@/components/dashboard/RecentSales'
-import SalesTrendChart from '@/components/dashboard/SalesTrendChart'
+import CustomizableDashboard from '@/components/dashboard/CustomizableDashboard'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Plus, ShoppingCart, Package } from 'lucide-react'
+import { Plus, ShoppingCart } from 'lucide-react'
 import { cookies } from 'next/headers'
 
 export default async function DashboardPage() {
@@ -96,39 +94,11 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <StatsCards todaySales={todaySales} totalStock={totalStock} />
-
-      <SalesTrendChart initialInvoices={recentInvoices || []} />
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <RecentSales invoices={recentInvoices || []} />
-        <div className="rounded-lg border bg-white p-6">
-          <h2 className="mb-4 text-xl font-semibold">Quick Actions</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <Link href="/inventory">
-              <Button variant="outline" className="w-full">
-                <Package className="mr-2 h-4 w-4" />
-                View Inventory
-              </Button>
-            </Link>
-            <Link href="/customers">
-              <Button variant="outline" className="w-full">
-                View Customers
-              </Button>
-            </Link>
-            <Link href="/reports">
-              <Button variant="outline" className="w-full">
-                View Reports
-              </Button>
-            </Link>
-            <Link href="/settings">
-              <Button variant="outline" className="w-full">
-                Settings
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
+      <CustomizableDashboard
+        todaySales={todaySales}
+        totalStock={totalStock}
+        recentInvoices={recentInvoices || []}
+      />
     </div>
   )
 }

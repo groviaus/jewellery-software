@@ -13,10 +13,12 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
+    const customerId = searchParams.get('customer_id')
+    const metalType = searchParams.get('metal_type')
 
     let query = supabase
       .from(TABLES.INVOICES)
-      .select('*')
+      .select('*, invoice_items(*, item:jewellery_items(*))')
       .eq('user_id', user.id)
 
     if (startDate) {
@@ -24,6 +26,9 @@ export async function GET(request: Request) {
     }
     if (endDate) {
       query = query.lte('created_at', `${endDate}T23:59:59`)
+    }
+    if (customerId) {
+      query = query.eq('customer_id', customerId)
     }
 
     const { data: invoices, error } = await query.order('created_at', {
@@ -34,10 +39,24 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    // Filter by metal type if specified
+    let filteredInvoices = invoices || []
+    if (metalType && invoices) {
+      filteredInvoices = invoices.filter((invoice) => {
+        if (!invoice.invoice_items || invoice.invoice_items.length === 0) {
+          return false
+        }
+        // Check if any item in the invoice matches the metal type
+        return invoice.invoice_items.some(
+          (item: any) => item.item?.metal_type === metalType
+        )
+      })
+    }
+
     // Group by date
     const dailyData = new Map<string, any>()
 
-    invoices?.forEach((invoice) => {
+    filteredInvoices.forEach((invoice) => {
       const date = new Date(invoice.created_at).toISOString().split('T')[0]
       const existing = dailyData.get(date) || {
         date,

@@ -3,6 +3,10 @@ export interface Customer {
   user_id: string
   name: string
   phone: string
+  email?: string
+  address?: string
+  tags?: string[]
+  notes?: string
   created_at: string
   updated_at: string
 }
@@ -10,6 +14,10 @@ export interface Customer {
 export interface CustomerFormData {
   name: string
   phone: string
+  email?: string
+  address?: string
+  tags?: string[]
+  notes?: string
 }
 
 export interface CustomerPurchaseHistory {

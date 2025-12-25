@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { name, phone } = body
+    const { name, phone, email, address, tags, notes } = body
 
     if (!name || !phone) {
       return NextResponse.json(
@@ -53,6 +53,10 @@ export async function POST(request: Request) {
         user_id: user.id,
         name,
         phone,
+        email: email || null,
+        address: address || null,
+        tags: tags || null,
+        notes: notes || null,
       })
       .select()
       .single()
