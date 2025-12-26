@@ -13,9 +13,9 @@ export default async function ProtectedLayout({
 
   return (
     <ProtectedLayoutWrapper>
-      <SidebarProvider>
+      <SidebarProvider className="h-svh overflow-hidden">
         <AppSidebar />
-        <SidebarInset>
+        <SidebarInset className="overflow-hidden h-full">
           <header className="flex h-16 shrink-0 items-center justify-between border-b px-4">
             <SidebarTrigger className="-ml-1" />
             <BackButton />
