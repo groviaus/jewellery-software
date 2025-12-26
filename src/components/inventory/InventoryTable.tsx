@@ -87,8 +87,8 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
   const filteredAndSortedItems = useMemo(() => {
     let filtered = items.filter((item) => {
       // Basic search filter (can be overridden by advanced filters)
-      const basicSearchQuery = advancedFilters.searchQuery !== undefined 
-        ? advancedFilters.searchQuery 
+      const basicSearchQuery = advancedFilters.searchQuery !== undefined
+        ? advancedFilters.searchQuery
         : searchQuery
       const matchesSearch = !basicSearchQuery ||
         item.name.toLowerCase().includes(basicSearchQuery.toLowerCase()) ||
@@ -97,30 +97,30 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
         item.purity.toLowerCase().includes(basicSearchQuery.toLowerCase())
 
       // Metal type filter (advanced filters take precedence)
-      const filterMetalType = advancedFilters.metalType !== undefined 
-        ? advancedFilters.metalType 
+      const filterMetalType = advancedFilters.metalType !== undefined
+        ? advancedFilters.metalType
         : metalTypeFilter
       const matchesMetalType = filterMetalType === 'all' || item.metal_type === filterMetalType
 
       // Purity filter (from advanced filters)
-      const matchesPurity = !advancedFilters.purity || 
+      const matchesPurity = !advancedFilters.purity ||
         item.purity.toLowerCase().includes(advancedFilters.purity.toLowerCase())
 
       // Weight filters (from advanced filters)
-      const matchesMinWeight = advancedFilters.minWeight === undefined || 
+      const matchesMinWeight = advancedFilters.minWeight === undefined ||
         item.net_weight >= advancedFilters.minWeight
-      const matchesMaxWeight = advancedFilters.maxWeight === undefined || 
+      const matchesMaxWeight = advancedFilters.maxWeight === undefined ||
         item.net_weight <= advancedFilters.maxWeight
 
       // Quantity filters (from advanced filters)
-      const matchesMinQuantity = advancedFilters.minQuantity === undefined || 
+      const matchesMinQuantity = advancedFilters.minQuantity === undefined ||
         item.quantity >= advancedFilters.minQuantity
-      const matchesMaxQuantity = advancedFilters.maxQuantity === undefined || 
+      const matchesMaxQuantity = advancedFilters.maxQuantity === undefined ||
         item.quantity <= advancedFilters.maxQuantity
 
       // Stock filter (advanced filters take precedence)
-      const filterStockStatus = advancedFilters.stockStatus !== undefined 
-        ? advancedFilters.stockStatus 
+      const filterStockStatus = advancedFilters.stockStatus !== undefined
+        ? advancedFilters.stockStatus
         : stockFilter
       let matchesStock = true
       if (filterStockStatus === 'low') {
@@ -131,9 +131,9 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
         matchesStock = item.quantity > stockAlertThreshold
       }
 
-      return matchesSearch && matchesMetalType && matchesPurity && 
-        matchesMinWeight && matchesMaxWeight && 
-        matchesMinQuantity && matchesMaxQuantity && 
+      return matchesSearch && matchesMetalType && matchesPurity &&
+        matchesMinWeight && matchesMaxWeight &&
+        matchesMinQuantity && matchesMaxQuantity &&
         matchesStock
     })
 
@@ -204,7 +204,7 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
       } else if (field === 'gross_weight') {
         updates.gross_weight = parseFloat(editingValue) || 0
       }
-      
+
       await updateMutation.mutateAsync({ id: itemId, data: updates })
       setEditingItemId(null)
       setEditingField(null)
@@ -476,7 +476,7 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
             </Button>
           </div>
         </div>
-        
+
         {/* Quick Filter Buttons */}
         <div className="flex flex-wrap gap-2">
           <Button
@@ -574,12 +574,11 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
                   title="Select all"
                 >
                   <CheckSquare
-                    className={`h-4 w-4 ${
-                      selectedItems.size === filteredAndSortedItems.length &&
-                      filteredAndSortedItems.length > 0
+                    className={`h-4 w-4 ${selectedItems.size === filteredAndSortedItems.length &&
+                        filteredAndSortedItems.length > 0
                         ? 'text-primary'
                         : 'text-muted-foreground'
-                    }`}
+                      }`}
                   />
                 </button>
               </TableHead>
@@ -630,9 +629,8 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
                         title="Select item"
                       >
                         <CheckSquare
-                          className={`h-4 w-4 ${
-                            isSelected ? 'text-primary' : 'text-muted-foreground'
-                          }`}
+                          className={`h-4 w-4 ${isSelected ? 'text-primary' : 'text-muted-foreground'
+                            }`}
                         />
                       </button>
                     </TableCell>
@@ -757,13 +755,12 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
                         ) : (
                           <div className="flex items-center gap-1">
                             <span
-                              className={`font-medium ${
-                                isOutOfStock
+                              className={`font-medium ${isOutOfStock
                                   ? 'text-destructive'
                                   : isLowStock
                                     ? 'text-orange-600 dark:text-orange-400'
                                     : 'text-green-600 dark:text-green-400'
-                              }`}
+                                }`}
                             >
                               {item.quantity}
                             </span>

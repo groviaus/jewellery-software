@@ -138,10 +138,10 @@ export default function ItemSelector({ onAddToCart }: ItemSelectorProps) {
                 const isLowStock = item.quantity <= stockAlertThreshold && item.quantity > 0
                 const isOutOfStock = item.quantity === 0
                 const isSelected = index === selectedItemIndex
-                
+
                 return (
-                  <TableRow 
-                    key={item.id} 
+                  <TableRow
+                    key={item.id}
                     className={`${isOutOfStock ? 'opacity-50' : ''} ${isSelected ? 'bg-muted' : ''}`}
                     onMouseEnter={() => setSelectedItemIndex(index)}
                   >
@@ -149,13 +149,12 @@ export default function ItemSelector({ onAddToCart }: ItemSelectorProps) {
                     <TableCell className="text-sm text-muted-foreground">{item.sku}</TableCell>
                     <TableCell>{item.net_weight}g</TableCell>
                     <TableCell>
-                      <span className={`font-medium ${
-                        isOutOfStock 
-                          ? 'text-destructive' 
-                          : isLowStock 
-                            ? 'text-orange-600 dark:text-orange-400' 
+                      <span className={`font-medium ${isOutOfStock
+                          ? 'text-destructive'
+                          : isLowStock
+                            ? 'text-orange-600 dark:text-orange-400'
                             : 'text-green-600 dark:text-green-400'
-                      }`}>
+                        }`}>
                         {item.quantity}
                       </span>
                       {isLowStock && !isOutOfStock && (

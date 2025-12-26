@@ -26,7 +26,7 @@ export default function ProfitMarginReport() {
     format(new Date(new Date().getFullYear(), 0, 1), 'yyyy-MM-dd')
   )
   const [endDate, setEndDate] = useState(format(new Date(), 'yyyy-MM-dd'))
-  
+
   const { data: report, isLoading, refetch } = useProfitMarginReport(
     startDate ? `${startDate}T00:00:00.000Z` : undefined,
     endDate ? `${endDate}T23:59:59.999Z` : undefined
