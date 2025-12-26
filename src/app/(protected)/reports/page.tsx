@@ -1,9 +1,12 @@
+'use client'
+
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { FileText, Package, TrendingUp, DollarSign, Award, Receipt } from 'lucide-react'
 
 export default function ReportsPage() {
+
   return (
     <div>
       <h1 className="text-3xl font-bold">Reports</h1>

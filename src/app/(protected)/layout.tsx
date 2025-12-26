@@ -2,6 +2,7 @@ import { requireAuth } from '@/lib/auth'
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
 import { ProtectedLayoutWrapper } from '@/components/theme/protected-layout-wrapper'
+import { BackButton } from '@/components/ui/back-button'
 
 export default async function ProtectedLayout({
   children,
@@ -15,8 +16,9 @@ export default async function ProtectedLayout({
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <header className="flex h-16 shrink-0 items-center justify-between border-b px-4">
             <SidebarTrigger className="-ml-1" />
+            <BackButton />
           </header>
           <main className="flex-1 overflow-auto p-4">
             {children}

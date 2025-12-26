@@ -1,9 +1,12 @@
+'use client'
+
 import POSScreen from '@/components/billing/POSScreen'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { FileText } from 'lucide-react'
 
 export default function BillingPage() {
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">

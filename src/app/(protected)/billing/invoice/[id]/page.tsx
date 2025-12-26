@@ -12,10 +12,10 @@ export default async function InvoicePage({
 }) {
   const { id } = await params
   const user = await requireAuth()
-  
+
   const cookieStore = await cookies()
   const token = cookieStore.get('sb-access-token')?.value
-  
+
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -69,7 +69,9 @@ export default async function InvoicePage({
   }
 
   return (
-    <div>
+    <div className="space-y-4">
+      <h1 className="text-3xl font-bold">Invoice Details</h1>
+
       <InvoiceView invoice={invoiceData} settings={settings} />
     </div>
   )

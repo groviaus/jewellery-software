@@ -1,9 +1,12 @@
+'use client'
+
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Package, Users, TrendingUp, BarChart3 } from 'lucide-react'
+import { Package, Users, BarChart3 } from 'lucide-react'
 
 export default function AnalyticsPage() {
+
   return (
     <div>
       <h1 className="text-3xl font-bold">Analytics</h1>

@@ -9,10 +9,10 @@ import { cookies } from 'next/headers'
 
 export default async function InvoicesPage() {
   const user = await requireAuth()
-  
+
   const cookieStore = await cookies()
   const token = cookieStore.get('sb-access-token')?.value
-  
+
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -45,8 +45,10 @@ export default async function InvoicesPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">All Invoices</h1>
-          <p className="mt-2 text-gray-600">View and manage all generated invoices</p>
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-bold">All Invoices</h1>
+          </div>
+          <p className="mt-2 text-muted-foreground">View and manage all generated invoices</p>
         </div>
         <Link href="/billing">
           <Button>
