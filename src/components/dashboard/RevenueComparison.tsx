@@ -96,53 +96,59 @@ export default function RevenueComparison() {
           {/* This Month */}
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div>
-              <p className="text-sm text-gray-600">This Month</p>
+              <p className="text-sm text-muted-foreground">This Month</p>
               <p className="text-2xl font-bold">{formatCurrency(thisMonthRevenue || 0)}</p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 {monthNames[currentMonth]} {currentYear}
               </p>
             </div>
-            <div className="rounded-full bg-blue-100 p-3">
-              <TrendingUp className="h-6 w-6 text-blue-600" />
+            <div className="rounded-full bg-blue-500/20 dark:bg-blue-500/10 p-3">
+              <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
 
           {/* Last Month */}
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div>
-              <p className="text-sm text-gray-600">Last Month</p>
+              <p className="text-sm text-muted-foreground">Last Month</p>
               <p className="text-2xl font-bold">{formatCurrency(lastMonthRevenue || 0)}</p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 {monthNames[lastMonth]} {lastMonthYear}
               </p>
             </div>
-            <div className="rounded-full bg-gray-100 p-3">
-              <TrendingDown className="h-6 w-6 text-gray-600" />
+            <div className="rounded-full bg-muted p-3">
+              <TrendingDown className="h-6 w-6 text-muted-foreground" />
             </div>
           </div>
 
           {/* Comparison */}
           {comparison && (
             <div className={`rounded-lg border p-4 ${
-              comparison.isPositive ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+              comparison.isPositive 
+                ? 'bg-green-500/20 dark:bg-green-500/10 border-green-500/30 dark:border-green-500/20' 
+                : 'bg-red-500/20 dark:bg-red-500/10 border-red-500/30 dark:border-red-500/20'
             }`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Change</p>
+                  <p className="text-sm font-medium text-foreground">Change</p>
                   <p className={`text-xl font-bold ${
-                    comparison.isPositive ? 'text-green-700' : 'text-red-700'
+                    comparison.isPositive 
+                      ? 'text-green-700 dark:text-green-400' 
+                      : 'text-red-700 dark:text-red-400'
                   }`}>
                     {comparison.isPositive ? '+' : ''}{formatCurrency(comparison.difference)}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   {comparison.isPositive ? (
-                    <ArrowUpRight className="h-5 w-5 text-green-600" />
+                    <ArrowUpRight className="h-5 w-5 text-green-600 dark:text-green-400" />
                   ) : (
-                    <ArrowDownRight className="h-5 w-5 text-red-600" />
+                    <ArrowDownRight className="h-5 w-5 text-red-600 dark:text-red-400" />
                   )}
                   <span className={`text-lg font-semibold ${
-                    comparison.isPositive ? 'text-green-700' : 'text-red-700'
+                    comparison.isPositive 
+                      ? 'text-green-700 dark:text-green-400' 
+                      : 'text-red-700 dark:text-red-400'
                   }`}>
                     {comparison.percentageChange >= 0 ? '+' : ''}
                     {comparison.percentageChange.toFixed(1)}%

@@ -100,26 +100,26 @@ export default function CustomizableDashboard({
         return <RevenueComparison />
       case 'quick-actions':
         return (
-          <div className="rounded-lg border bg-white p-6">
-            <h2 className="mb-4 text-xl font-semibold">Quick Actions</h2>
+          <div className="rounded-lg border bg-card p-6">
+            <h2 className="mb-4 text-xl font-semibold text-card-foreground">Quick Actions</h2>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               <a href="/inventory" className="w-full">
-                <button className="w-full rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent">
+                <button className="w-full rounded-md border border-input bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
                   View Inventory
                 </button>
               </a>
               <a href="/customers" className="w-full">
-                <button className="w-full rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent">
+                <button className="w-full rounded-md border border-input bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
                   View Customers
                 </button>
               </a>
               <a href="/reports" className="w-full">
-                <button className="w-full rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent">
+                <button className="w-full rounded-md border border-input bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
                   View Reports
                 </button>
               </a>
               <a href="/settings" className="w-full">
-                <button className="w-full rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent">
+                <button className="w-full rounded-md border border-input bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
                   Settings
                 </button>
               </a>

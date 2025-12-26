@@ -100,7 +100,7 @@ export default function ItemSelector({ onAddToCart }: ItemSelectorProps) {
   return (
     <div className="space-y-4">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           ref={searchInputRef}
           placeholder="Search items by name or SKU... (Ctrl+K)"
@@ -129,7 +129,7 @@ export default function ItemSelector({ onAddToCart }: ItemSelectorProps) {
           <TableBody>
             {filteredItems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-gray-500">
+                <TableCell colSpan={6} className="text-center text-muted-foreground">
                   {searchQuery ? 'No items found' : 'No items in stock'}
                 </TableCell>
               </TableRow>
@@ -153,13 +153,13 @@ export default function ItemSelector({ onAddToCart }: ItemSelectorProps) {
                         isOutOfStock 
                           ? 'text-destructive' 
                           : isLowStock 
-                            ? 'text-orange-600' 
-                            : 'text-green-600'
+                            ? 'text-orange-600 dark:text-orange-400' 
+                            : 'text-green-600 dark:text-green-400'
                       }`}>
                         {item.quantity}
                       </span>
                       {isLowStock && !isOutOfStock && (
-                        <span className="ml-1 text-xs text-orange-600">(Low)</span>
+                        <span className="ml-1 text-xs text-orange-600 dark:text-orange-400">(Low)</span>
                       )}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">

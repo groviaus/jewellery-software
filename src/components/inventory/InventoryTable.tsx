@@ -343,7 +343,7 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
       {(lowStockItems.length > 0 || outOfStockItems.length > 0) && (
         <div className="mb-4 space-y-2">
           {lowStockItems.length > 0 && (
-            <div className="rounded-md border border-orange-200 bg-orange-50 p-3 text-sm text-orange-800">
+            <div className="rounded-md border border-orange-500/30 bg-orange-500/20 dark:bg-orange-500/10 p-3 text-sm text-orange-700 dark:text-orange-400">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
                 <span>
@@ -353,7 +353,7 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
             </div>
           )}
           {outOfStockItems.length > 0 && (
-            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+            <div className="rounded-md border border-red-500/30 bg-red-500/20 dark:bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-400">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
                 <span>
@@ -380,7 +380,7 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
       <div className="mb-4 space-y-3">
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search by name, SKU, metal type, or purity..."
               value={searchQuery}
@@ -595,7 +595,7 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
                   <div className="flex items-center gap-1">
                     Quantity
                     {(lowStockItems.length > 0 || outOfStockItems.length > 0) && (
-                      <AlertTriangle className="h-3 w-3 text-orange-500" />
+                      <AlertTriangle className="h-3 w-3 text-orange-500 dark:text-orange-400" />
                     )}
                   </div>
                 </TableHead>
@@ -606,7 +606,7 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
           <TableBody>
             {paginatedItems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={visibleColumns.size + 1} className="text-center text-gray-500">
+                <TableCell colSpan={visibleColumns.size + 1} className="text-center text-muted-foreground">
                   {searchQuery || metalTypeFilter !== 'all' || stockFilter !== 'all'
                     ? 'No items found matching your filters'
                     : 'No items in inventory'}
@@ -761,14 +761,14 @@ export default function InventoryTable({ items: initialItems }: InventoryTablePr
                                 isOutOfStock
                                   ? 'text-destructive'
                                   : isLowStock
-                                    ? 'text-orange-600'
-                                    : 'text-green-600'
+                                    ? 'text-orange-600 dark:text-orange-400'
+                                    : 'text-green-600 dark:text-green-400'
                               }`}
                             >
                               {item.quantity}
                             </span>
                             {isLowStock && (
-                              <AlertTriangle className="h-3 w-3 text-orange-500" />
+                              <AlertTriangle className="h-3 w-3 text-orange-500 dark:text-orange-400" />
                             )}
                             {isOutOfStock && (
                               <span className="text-xs text-destructive">(Out)</span>

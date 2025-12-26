@@ -17,10 +17,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Crown, User, UserPlus, UserX } from 'lucide-react'
 
 const segmentConfig = {
-  VIP: { icon: Crown, color: 'bg-purple-100 text-purple-800', label: 'VIP' },
-  Regular: { icon: User, color: 'bg-blue-100 text-blue-800', label: 'Regular' },
-  New: { icon: UserPlus, color: 'bg-green-100 text-green-800', label: 'New' },
-  Inactive: { icon: UserX, color: 'bg-gray-100 text-gray-800', label: 'Inactive' },
+  VIP: { icon: Crown, color: 'bg-purple-500/20 text-purple-600 dark:text-purple-400 border-purple-500/30', label: 'VIP' },
+  Regular: { icon: User, color: 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30', label: 'Regular' },
+  New: { icon: UserPlus, color: 'bg-green-500/20 text-green-600 dark:text-green-400 border-green-500/30', label: 'New' },
+  Inactive: { icon: UserX, color: 'bg-muted text-muted-foreground border-border', label: 'Inactive' },
 }
 
 export default function CustomerSegmentation() {
@@ -103,7 +103,7 @@ export default function CustomerSegmentation() {
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
                           {customer.customer_name}
-                          <Badge className={config.color}>{config.label}</Badge>
+                          <Badge variant="outline" className={config.color}>{config.label}</Badge>
                         </div>
                       </TableCell>
                       <TableCell>{customer.phone}</TableCell>

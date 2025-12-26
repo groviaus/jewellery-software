@@ -85,18 +85,18 @@ export default function InvoiceView({ invoice, settings }: InvoiceViewProps) {
                   {settings?.store_name || 'Jewellery Store'}
                 </h1>
                 {settings?.address && (
-                  <p className="mt-1 text-sm text-gray-600">{settings.address}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{settings.address}</p>
                 )}
                 {settings?.gst_number && (
-                  <p className="text-sm text-gray-600">GST: {settings.gst_number}</p>
+                  <p className="text-sm text-muted-foreground">GST: {settings.gst_number}</p>
                 )}
               </div>
               <div className="text-right">
                 <h2 className="text-xl font-bold">INVOICE</h2>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-muted-foreground">
                   {invoice.invoice_number}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Date: {format(new Date(invoice.created_at), 'MMM dd, yyyy')}
                 </p>
               </div>
@@ -108,7 +108,7 @@ export default function InvoiceView({ invoice, settings }: InvoiceViewProps) {
             <div className="mb-6">
               <h3 className="mb-2 font-semibold">Bill To:</h3>
               <p>{invoice.customer.name}</p>
-              <p className="text-sm text-gray-600">{invoice.customer.phone}</p>
+              <p className="text-sm text-muted-foreground">{invoice.customer.phone}</p>
             </div>
           )}
 
@@ -129,7 +129,7 @@ export default function InvoiceView({ invoice, settings }: InvoiceViewProps) {
                 {invoice.items.map((item) => (
                   <tr key={item.id} className="border-b">
                     <td className="p-2">{item.item?.name || 'N/A'}</td>
-                    <td className="p-2 text-sm text-gray-600">
+                    <td className="p-2 text-sm text-muted-foreground">
                       {item.item?.sku || 'N/A'}
                     </td>
                     <td className="p-2 text-right">{item.weight}</td>
@@ -169,7 +169,7 @@ export default function InvoiceView({ invoice, settings }: InvoiceViewProps) {
           </div>
 
           {/* Footer */}
-          <div className="mt-8 border-t pt-4 text-center text-sm text-gray-600">
+          <div className="mt-8 border-t pt-4 text-center text-sm text-muted-foreground">
             <p>Thank you for your business!</p>
           </div>
         </CardContent>

@@ -281,7 +281,7 @@ export default function InvoicePreview({
   }
 
   if (cart.length === 0) {
-    return <p className="text-center text-gray-500">Cart is empty</p>
+    return <p className="text-center text-muted-foreground">Cart is empty</p>
   }
 
   return (
