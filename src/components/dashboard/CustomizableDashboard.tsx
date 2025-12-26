@@ -62,9 +62,55 @@ export default function CustomizableDashboard({
 
     if (over && active.id !== over.id) {
       setWidgets((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id)
-        const newIndex = items.findIndex((item) => item.id === over.id)
-        const newItems = arrayMove(items, oldIndex, newIndex)
+        // Helper function to extract widget IDs from a sortable ID (could be widget ID or grid group ID)
+        const getWidgetIds = (sortableId: string): string[] => {
+          if (sortableId.startsWith('grid-')) {
+            // Extract widget IDs from grid group ID
+            return sortableId.replace('grid-', '').split('-')
+          }
+          return [sortableId]
+        }
+
+        const activeWidgetIds = getWidgetIds(active.id as string)
+        const overWidgetIds = getWidgetIds(over.id as string)
+
+        // IMPORTANT: Work with sorted items to get correct positions
+        const sortedItems = [...items].sort((a, b) => a.order - b.order)
+
+        // Find the position of the first widget in each group in the SORTED array
+        const oldIndex = sortedItems.findIndex((item) => activeWidgetIds.includes(item.id))
+        const newIndex = sortedItems.findIndex((item) => overWidgetIds.includes(item.id))
+
+        if (oldIndex === -1 || newIndex === -1) return items
+
+        // Move all widgets in the active group
+        let newItems = [...sortedItems]
+        const widgetsToMove = activeWidgetIds.map(id => sortedItems.find(item => item.id === id)!).filter(Boolean)
+
+        // Remove the widgets to move
+        newItems = newItems.filter(item => !activeWidgetIds.includes(item.id))
+
+        // Calculate the new insertion index
+        // Find the last widget in the "over" group in the filtered array
+        let adjustedNewIndex = -1
+        for (let i = newItems.length - 1; i >= 0; i--) {
+          if (overWidgetIds.includes(newItems[i].id)) {
+            adjustedNewIndex = i
+            break
+          }
+        }
+
+        if (adjustedNewIndex === -1) return items
+
+        // If dragging down, insert after the target group; if dragging up, insert before
+        const insertIndex = oldIndex < newIndex ? adjustedNewIndex + 1 : adjustedNewIndex
+
+        // Insert the widgets at the new position
+        newItems.splice(insertIndex, 0, ...widgetsToMove)
+
+        // Update order property
+        newItems = newItems.map((item, index) => ({ ...item, order: index }))
+
         updateWidgetOrder(newItems.map((w) => w.id))
         return newItems
       })
@@ -136,7 +182,9 @@ export default function CustomizableDashboard({
     return widgetId === 'recent-sales' || widgetId === 'revenue-comparison'
   }
 
+  // Create sortable items - each item is either a single widget or a group ID
   const groupedWidgets: (DashboardWidget | DashboardWidget[])[] = []
+  const sortableIds: string[] = []
   let currentGroup: DashboardWidget[] = []
 
   visibleWidgets.forEach((widget, index) => {
@@ -146,17 +194,24 @@ export default function CustomizableDashboard({
       if (index === visibleWidgets.length - 1 || !shouldBeInGrid(visibleWidgets[index + 1]?.id)) {
         if (currentGroup.length === 1) {
           groupedWidgets.push(currentGroup[0])
+          sortableIds.push(currentGroup[0].id)
         } else {
+          // Create a group ID for the grid container
+          const groupId = `grid-${currentGroup.map(w => w.id).join('-')}`
           groupedWidgets.push([...currentGroup])
+          sortableIds.push(groupId)
         }
         currentGroup = []
       }
     } else {
       if (currentGroup.length > 0) {
+        const groupId = `grid-${currentGroup.map(w => w.id).join('-')}`
         groupedWidgets.push([...currentGroup])
+        sortableIds.push(groupId)
         currentGroup = []
       }
       groupedWidgets.push(widget)
+      sortableIds.push(widget.id)
     }
   })
 
@@ -174,21 +229,24 @@ export default function CustomizableDashboard({
         onDragEnd={handleDragEnd}
       >
         <SortableContext
-          items={visibleWidgets.map((w) => w.id)}
+          items={sortableIds}
           strategy={verticalListSortingStrategy}
         >
           <div className="space-y-6">
             {groupedWidgets.map((widgetOrGroup, index) => {
               if (Array.isArray(widgetOrGroup)) {
-                // Render grid layout for grouped widgets
+                // Render grid layout for grouped widgets as a single sortable unit
+                const groupId = `grid-${widgetOrGroup.map(w => w.id).join('-')}`
                 return (
-                  <div key={`group-${index}`} className="grid gap-6 lg:grid-cols-2">
-                    {widgetOrGroup.map((widget) => (
-                      <SortableWidget key={widget.id} id={widget.id}>
-                        {renderWidget(widget)}
-                      </SortableWidget>
-                    ))}
-                  </div>
+                  <SortableWidget key={groupId} id={groupId}>
+                    <div className="grid gap-6 lg:grid-cols-2">
+                      {widgetOrGroup.map((widget) => (
+                        <div key={widget.id}>
+                          {renderWidget(widget)}
+                        </div>
+                      ))}
+                    </div>
+                  </SortableWidget>
                 )
               } else {
                 return (

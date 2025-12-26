@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 async function fetchMonthlyRevenue(year: number, month: number): Promise<number> {
   const startDate = new Date(year, month, 1)
   const endDate = new Date(year, month + 1, 0, 23, 59, 59)
-  
+
   const params = new URLSearchParams()
   params.append('start_date', startDate.toISOString().split('T')[0])
   params.append('end_date', endDate.toISOString().split('T')[0])
@@ -20,7 +20,7 @@ async function fetchMonthlyRevenue(year: number, month: number): Promise<number>
     throw new Error('Failed to fetch monthly revenue')
   }
   const data = await response.json()
-  
+
   // Sum up all daily revenues
   const dailyReports = data.data || []
   return dailyReports.reduce((sum: number, report: any) => sum + report.total_revenue, 0)
@@ -30,7 +30,7 @@ export default function RevenueComparison() {
   const now = new Date()
   const currentMonth = now.getMonth()
   const currentYear = now.getFullYear()
-  
+
   const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1
   const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear
 
@@ -50,12 +50,12 @@ export default function RevenueComparison() {
     if (!thisMonthRevenue || !lastMonthRevenue) {
       return null
     }
-    
+
     const difference = thisMonthRevenue - lastMonthRevenue
-    const percentageChange = lastMonthRevenue > 0 
-      ? (difference / lastMonthRevenue) * 100 
+    const percentageChange = lastMonthRevenue > 0
+      ? (difference / lastMonthRevenue) * 100
       : 0
-    
+
     return {
       difference,
       percentageChange,
@@ -67,11 +67,11 @@ export default function RevenueComparison() {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="h-[500px] flex flex-col">
         <CardHeader>
           <CardTitle>Revenue Comparison</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1">
           <div className="space-y-4">
             <Skeleton className="h-16 w-full" />
             <Skeleton className="h-16 w-full" />
@@ -87,11 +87,11 @@ export default function RevenueComparison() {
   ]
 
   return (
-    <Card>
+    <Card className="h-[500px] flex flex-col">
       <CardHeader>
         <CardTitle>Revenue Comparison</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1">
         <div className="space-y-6">
           {/* This Month */}
           <div className="flex items-center justify-between rounded-lg border p-4">
@@ -123,19 +123,17 @@ export default function RevenueComparison() {
 
           {/* Comparison */}
           {comparison && (
-            <div className={`rounded-lg border p-4 ${
-              comparison.isPositive 
-                ? 'bg-green-500/20 dark:bg-green-500/10 border-green-500/30 dark:border-green-500/20' 
-                : 'bg-red-500/20 dark:bg-red-500/10 border-red-500/30 dark:border-red-500/20'
-            }`}>
+            <div className={`rounded-lg border p-4 ${comparison.isPositive
+              ? 'bg-green-500/20 dark:bg-green-500/10 border-green-500/30 dark:border-green-500/20'
+              : 'bg-red-500/20 dark:bg-red-500/10 border-red-500/30 dark:border-red-500/20'
+              }`}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-foreground">Change</p>
-                  <p className={`text-xl font-bold ${
-                    comparison.isPositive 
-                      ? 'text-green-700 dark:text-green-400' 
-                      : 'text-red-700 dark:text-red-400'
-                  }`}>
+                  <p className={`text-xl font-bold ${comparison.isPositive
+                    ? 'text-green-700 dark:text-green-400'
+                    : 'text-red-700 dark:text-red-400'
+                    }`}>
                     {comparison.isPositive ? '+' : ''}{formatCurrency(comparison.difference)}
                   </p>
                 </div>
@@ -145,11 +143,10 @@ export default function RevenueComparison() {
                   ) : (
                     <ArrowDownRight className="h-5 w-5 text-red-600 dark:text-red-400" />
                   )}
-                  <span className={`text-lg font-semibold ${
-                    comparison.isPositive 
-                      ? 'text-green-700 dark:text-green-400' 
-                      : 'text-red-700 dark:text-red-400'
-                  }`}>
+                  <span className={`text-lg font-semibold ${comparison.isPositive
+                    ? 'text-green-700 dark:text-green-400'
+                    : 'text-red-700 dark:text-red-400'
+                    }`}>
                     {comparison.percentageChange >= 0 ? '+' : ''}
                     {comparison.percentageChange.toFixed(1)}%
                   </span>

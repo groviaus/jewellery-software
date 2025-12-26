@@ -35,9 +35,10 @@ export default function SortableWidget({ id, children }: SortableWidgetProps) {
       <div
         {...attributes}
         {...listeners}
-        className="absolute -left-8 top-4 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute right-2 top-2 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity z-10 bg-background/80 backdrop-blur-sm p-1.5 rounded-md border border-border shadow-sm hover:bg-accent"
+        title="Drag to reorder"
       >
-        <GripVertical className="h-5 w-5 text-gray-400" />
+        <GripVertical className="h-4 w-4 text-muted-foreground" />
       </div>
       {children}
     </div>

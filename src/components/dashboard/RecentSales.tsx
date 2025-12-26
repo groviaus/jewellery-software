@@ -30,27 +30,27 @@ interface RecentSalesProps {
 
 export default function RecentSales({ invoices: initialInvoices }: RecentSalesProps) {
   // Use React Query hook - now the endpoint exists and will fetch/update automatically
-  const { data: queryInvoices, isLoading } = useRecentInvoices(10, { 
-    initialData: (initialInvoices || []) as Invoice[] 
+  const { data: queryInvoices, isLoading } = useRecentInvoices(10, {
+    initialData: (initialInvoices || []) as Invoice[]
   })
-  
+
   // Use query data if available (will auto-update), otherwise use server data
   const displayInvoices = queryInvoices || initialInvoices || []
-  
+
   // Normalize customer data - Supabase returns customer as array for foreign key relationships
   const normalizedInvoices = displayInvoices.map((invoice: any) => ({
     ...invoice,
-    customer: Array.isArray(invoice.customer) 
+    customer: Array.isArray(invoice.customer)
       ? invoice.customer[0] || null
       : invoice.customer || null
   }))
-  
+
   return (
-    <Card>
+    <Card className="h-[500px] flex flex-col">
       <CardHeader>
         <CardTitle>Recent Sales</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 overflow-hidden">
         {isLoading && (!initialInvoices || initialInvoices.length === 0) ? (
           <div className="space-y-2">
             {[1, 2, 3, 4, 5].map((i) => (
@@ -60,9 +60,9 @@ export default function RecentSales({ invoices: initialInvoices }: RecentSalesPr
         ) : !normalizedInvoices || normalizedInvoices.length === 0 ? (
           <p className="text-center text-gray-500">No recent sales</p>
         ) : (
-          <div className="rounded-md border">
+          <div className="h-full overflow-y-auto scrollbar-hide rounded-md border">
             <Table>
-              <TableHeader>
+              <TableHeader className="sticky top-0 bg-background z-10">
                 <TableRow>
                   <TableHead>Invoice #</TableHead>
                   <TableHead>Customer</TableHead>
