@@ -24,6 +24,7 @@ import { formatCurrency } from '@/lib/utils/calculations'
 import { format } from 'date-fns'
 import { useSoldItemsReport } from '@/lib/hooks/useReports'
 import { useCustomers } from '@/lib/hooks/useCustomers'
+import type { SoldItem } from '@/lib/types/reports'
 import { Skeleton } from '@/components/ui/skeleton'
 import { exportToCSV } from '@/lib/utils/csv-export'
 import { exportReportToPDF } from '@/lib/utils/pdf-export'
@@ -64,7 +65,7 @@ export default function SoldItemsReport() {
       return
     }
 
-    const exportData = items.map((item) => ({
+    const exportData = items.map((item: SoldItem) => ({
       'Item Name': item.item_name,
       SKU: item.sku,
       'Quantity Sold': item.quantity_sold,
@@ -80,7 +81,7 @@ export default function SoldItemsReport() {
       return
     }
 
-    const exportData = items.map((item) => ({
+    const exportData = items.map((item: SoldItem) => ({
       'Item Name': item.item_name,
       SKU: item.sku,
       'Quantity Sold': item.quantity_sold,
@@ -96,7 +97,7 @@ export default function SoldItemsReport() {
       return
     }
 
-    const exportData = items.map((item) => ({
+    const exportData = items.map((item: SoldItem) => ({
       'Item Name': item.item_name,
       SKU: item.sku,
       'Quantity Sold': item.quantity_sold,
@@ -190,7 +191,7 @@ export default function SoldItemsReport() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {items.map((item) => (
+                {items.map((item: SoldItem) => (
                   <TableRow key={item.item_id}>
                     <TableCell className="font-medium">{item.item_name}</TableCell>
                     <TableCell>{item.sku}</TableCell>

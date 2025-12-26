@@ -80,11 +80,18 @@ export default function StoreSettingsForm({ initialData }: StoreSettingsFormProp
     setError('')
 
     try {
+      // Ensure gst_number is always a string (not undefined)
+      const formData = {
+        ...data,
+        gst_number: data.gst_number || '',
+        address: data.address || '',
+      }
+      
       if (initialData) {
-        await updateMutation.mutateAsync(data)
+        await updateMutation.mutateAsync(formData as any)
         toast.success('Settings updated successfully')
       } else {
-        await createMutation.mutateAsync(data)
+        await createMutation.mutateAsync(formData as any)
         toast.success('Settings saved successfully')
       }
 

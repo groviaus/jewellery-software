@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import type {
   DailySalesReport,
-  SoldItemsReport,
+  SoldItem,
   StockSummary,
   ProfitMarginReport,
   TopSellingItem,
@@ -30,7 +30,7 @@ async function fetchDailySalesReport(
   to?: string,
   customerId?: string,
   metalType?: string
-): Promise<DailySalesReport> {
+): Promise<DailySalesReport[]> {
   const params = new URLSearchParams()
   if (from) params.append('start_date', from)
   if (to) params.append('end_date', to)
@@ -51,7 +51,7 @@ async function fetchSoldItemsReport(
   to?: string,
   customerId?: string,
   metalType?: string
-): Promise<SoldItemsReport> {
+): Promise<SoldItem[]> {
   const params = new URLSearchParams()
   if (from) params.append('from', from)
   if (to) params.append('to', to)

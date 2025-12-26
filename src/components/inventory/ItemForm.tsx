@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import type { Item, ItemFormData } from '@/lib/types/inventory'
+import type { Item, ItemFormData, Purity } from '@/lib/types/inventory'
 import {
   useCreateInventoryItem,
   useUpdateInventoryItem,
@@ -26,7 +26,7 @@ import { toast } from '@/lib/utils/toast'
 const itemSchema = z.object({
   name: z.string().min(1, 'Item name is required'),
   metal_type: z.enum(['Gold', 'Silver', 'Diamond']),
-  purity: z.string().min(1, 'Purity is required'),
+  purity: z.enum(['22K', '18K', '14K', '24K', '925', 'Other']),
   gross_weight: z.number().min(0, 'Gross weight must be positive'),
   net_weight: z.number().min(0, 'Net weight must be positive'),
   making_charge: z.number().min(0, 'Making charge must be positive'),
@@ -80,11 +80,16 @@ export default function ItemForm({ initialData }: ItemFormProps) {
     setError('')
 
     try {
+      const formData: ItemFormData = {
+        ...data,
+        purity: data.purity as Purity,
+      }
+      
       if (initialData) {
-        await updateMutation.mutateAsync({ id: initialData.id, data })
+        await updateMutation.mutateAsync({ id: initialData.id, data: formData })
         toast.success('Item updated successfully', data.name)
       } else {
-        await createMutation.mutateAsync(data as any)
+        await createMutation.mutateAsync(formData)
         toast.success('Item created successfully', data.name)
       }
       router.push('/inventory')
@@ -166,11 +171,24 @@ export default function ItemForm({ initialData }: ItemFormProps) {
 
             <div className="space-y-2">
               <Label htmlFor="purity">Purity *</Label>
-              <Input
-                id="purity"
-                {...register('purity')}
-                placeholder="22K, 18K, 925, etc."
-              />
+              <Select
+                value={watch('purity')}
+                onValueChange={(value) =>
+                  setValue('purity', value as Purity)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select purity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="22K">22K</SelectItem>
+                  <SelectItem value="18K">18K</SelectItem>
+                  <SelectItem value="14K">14K</SelectItem>
+                  <SelectItem value="24K">24K</SelectItem>
+                  <SelectItem value="925">925</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
               {errors.purity && (
                 <p className="text-sm text-destructive">{errors.purity.message}</p>
               )}

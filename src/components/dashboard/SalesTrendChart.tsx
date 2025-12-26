@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import SalesChart from '@/components/charts/SalesChart'
 import { useRecentInvoices } from '@/lib/hooks/useInvoices'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Invoice } from '@/lib/types/billing'
 
 interface SalesTrendChartProps {
   initialInvoices?: Array<{
@@ -16,7 +17,7 @@ interface SalesTrendChartProps {
 
 export default function SalesTrendChart({ initialInvoices }: SalesTrendChartProps) {
   const { data: invoices = initialInvoices || [], isLoading } = useRecentInvoices(30, {
-    initialData: initialInvoices || [],
+    initialData: (initialInvoices || []) as Invoice[],
   })
 
   const chartData = useMemo(() => {

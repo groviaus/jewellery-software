@@ -111,9 +111,16 @@ export default function TabbedSettingsForm({ initialData }: TabbedSettingsFormPr
     console.log('Form submitted with data:', data)
 
     try {
+      // Ensure gst_number and address are always strings (not undefined)
+      const formData = {
+        ...data,
+        gst_number: data.gst_number || '',
+        address: data.address || '',
+      }
+      
       if (initialData) {
         console.log('Updating existing settings...')
-        const result = await updateMutation.mutateAsync(data)
+        const result = await updateMutation.mutateAsync(formData as any)
         console.log('Settings updated successfully:', result)
         toast.success('Settings updated successfully', 'Your changes have been saved.')
         // Update form with latest data
@@ -126,7 +133,7 @@ export default function TabbedSettingsForm({ initialData }: TabbedSettingsFormPr
         }, 500)
       } else {
         console.log('Creating new settings...')
-        const result = await createMutation.mutateAsync(data)
+        const result = await createMutation.mutateAsync(formData as any)
         console.log('Settings created successfully:', result)
         toast.success('Settings saved successfully', 'Your settings have been created.')
         // Update form with latest data

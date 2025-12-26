@@ -14,6 +14,7 @@ import { format } from 'date-fns'
 import Link from 'next/link'
 import { useRecentInvoices } from '@/lib/hooks/useInvoices'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { Invoice } from '@/lib/types/billing'
 
 interface RecentSalesProps {
   invoices?: Array<{
@@ -30,7 +31,7 @@ interface RecentSalesProps {
 export default function RecentSales({ invoices: initialInvoices }: RecentSalesProps) {
   // Use React Query hook - now the endpoint exists and will fetch/update automatically
   const { data: queryInvoices, isLoading } = useRecentInvoices(10, { 
-    initialData: initialInvoices || [] 
+    initialData: (initialInvoices || []) as Invoice[] 
   })
   
   // Use query data if available (will auto-update), otherwise use server data

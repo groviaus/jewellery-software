@@ -130,7 +130,7 @@ export async function GET(
       finalY + 22
     )
     doc.setFontSize(12)
-    doc.setFont(undefined, 'bold')
+    doc.setFont('helvetica', 'bold')
     doc.text('Grand Total:', 140, finalY + 30)
     doc.text(
       formatCurrency(parseFloat(invoice.total_amount.toString())),
@@ -139,7 +139,7 @@ export async function GET(
     )
 
     // Footer
-    doc.setFont(undefined, 'normal')
+    doc.setFont('helvetica', 'normal')
     doc.setFontSize(10)
     doc.text('Thank you for your business!', 105, finalY + 40, {
       align: 'center',

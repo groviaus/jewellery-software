@@ -20,9 +20,10 @@ function calculateRateByCarat(baseRate24K: number, carat: number): number {
  * 3. Market estimate fallback
  */
 export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const carat = searchParams.get('carat') // Optional: specific carat (22, 18, etc.)
+  
   try {
-    const { searchParams } = new URL(request.url)
-    const carat = searchParams.get('carat') // Optional: specific carat (22, 18, etc.)
 
     // Step 1: Fetch USD to INR exchange rate (FREE - no API key required)
     let usdToInr = 83 // Default fallback
